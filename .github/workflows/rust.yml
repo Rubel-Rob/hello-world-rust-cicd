@@ -54,5 +54,4 @@ jobs:
 
     - name: Publish to AWS CodeArtifact
       run: |
-       unzip -o target.zip -d./ && \
-       aws codeartifact publish-distribution-version --domain rtlabspoc --domain-owner 127355576263 --repository Rust-cicd-hello-world --version 1.0.0 --distribution-format tar.gz --input.
+       unzip -o target.zip -d./ && aws codeartifact publish-distribution-version --domain rtlabspoc --domain-owner 127355576263 --repository Rust-cicd-hello-world --version 1.0.0 --distribution-format tar.gz --input.
