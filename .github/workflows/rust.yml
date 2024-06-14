@@ -54,4 +54,4 @@ jobs:
 
     - name: Publish to AWS CodeArtifact
       run: |
-       unzip -o target.zip -d./ && aws codeartifact publish-distribution-version --domain rtlabspoc --domain-owner 127355576263 --repository Rust-cicd-hello-world --version 1.0.0 --distribution-format tar.gz --input.
+        export ASSET_SHA256=$(sha256sum target.zip | awk '{print $1;}') && aws codeartifact publish-package-version --domain rtlabspoc --domain-owner 127355576263 --repository Rust-cicd-hello-world --format generic --namespace rustcicd --package-version 1.0.0 --package rustpackage --asset-name target.zip  --asset-sha256 $ASSET_SHA256 --asset-content target.zip
