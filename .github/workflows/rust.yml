@@ -41,14 +41,16 @@ jobs:
         name: rust-binaries
 
     - name: Configure AWS Credentials
-    - uses: aws-actions/setup-sam@v2
+      uses: aws-actions/configure-aws-credentials@v2
       with:
-          use-installer: true
-    -  uses: aws-actions/configure-aws-credentials@v2
-       with:
-               aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-               aws-region: us-east-2
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    - name: Setup AWS SAM
+      uses: aws-actions/setup-sam@v2
+      with:
+        use-installer: true
 
     - name: Publish to AWS CodeArtifact
       run: |
