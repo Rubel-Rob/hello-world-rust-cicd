@@ -1,4 +1,4 @@
-name: Rust
+name: Rust CI
 
 on:
   push:
@@ -10,13 +10,53 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  build_and_publish:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
     - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      run: cargo build --release
+
+    - name: Archive Binaries
+      run: zip -r target.zip target/release/
+
+    - name: Upload Binaries as Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: rust-binaries
+        path: target.zip
+
+    - name: Download Binaries
+      id: download_binaries
+      uses: actions/download-artifact@v2
+      with:
+        name: rust-binaries
+
+    - name: Install AWS CLI
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo./aws/install
+
+    - name: Configure AWS Credentials
+      run: |
+        echo "${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+        echo "${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+        echo "${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+        aws configure set region $AWS_REGION
+
+    - name: Publish to AWS CodeArtifact
+      run: |
+        aws codeartifact create-domain-if-not-exists --domain my-domain --domain-owner 123456789012
+        aws codeartifact create-repository-in-domain-if-not-exists --domain my-domain --domain-owner 123456789012 --repository my-repo
+        unzip target.zip -d./ && aws codeartifact publish-distribution-version --domain my-domain --domain-owner 123456789012 --repository my-repo --version 1.0.0 --distribution-format tar.gz --input./
