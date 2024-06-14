@@ -54,6 +54,4 @@ jobs:
 
     - name: Publish to AWS CodeArtifact
       run: |
-        aws codeartifact create-domain-if-not-exists --domain my-domain --domain-owner 123456789012
-        aws codeartifact create-repository-in-domain-if-not-exists --domain my-domain --domain-owner 123456789012 --repository my-repo
-        unzip target.zip -d./ && aws codeartifact publish-distribution-version --domain my-domain --domain-owner 123456789012 --repository my-repo --version 1.0.0 --distribution-format tar.gz --input./
+        unzip target.zip -d./ && aws codeartifact publish-distribution-version --domain rtlabspoc --domain-owner 127355576263 --repository Rust-cicd-hello-world  --version 1.0.0 --distribution-format tar.gz --input./
